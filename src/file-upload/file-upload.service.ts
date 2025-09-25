@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { readdirSync } from 'fs';
 import { join } from 'path';
 
 @Injectable()
 export class FileUploadService {
-  getFilePath(filename: string): string {
-    return join(process.cwd(), 'uploads', filename);
-  }
+  getAllFiles(baseUrl: string): string[] {
+    const uploadDir = join(process.cwd(), 'uploads');
+    const files = readdirSync(uploadDir);
 
-  getPublicFilePath(filename: string): string {
-    return `/uploads/${filename}`;
+    return files.map((file) => `${baseUrl}/uploads/${file}`);
   }
 }
