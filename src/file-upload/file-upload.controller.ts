@@ -1,6 +1,8 @@
 import {
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Req,
   UploadedFile,
@@ -29,5 +31,11 @@ export class FileUploadController {
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return { message: 'File uploaded successfully', filePath: file.path };
+  }
+
+  @Delete(':fileName')
+  deleteFileByName(@Param('fileName') fileName: string) {
+    const deleteFile = this.fileUploadService.deleteFileByName(fileName);
+    return { message: deleteFile };
   }
 }
