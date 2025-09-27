@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UploadedFile } from '@nestjs/common';
 import { readdirSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { extname, join } from 'path';
+import sharp from 'sharp';
 
 @Injectable()
 export class FileUploadService {
@@ -8,7 +9,6 @@ export class FileUploadService {
 
   getAllFiles(baseUrl: string): string[] {
     const files = readdirSync(this.uploadDir);
-
     return files.map((file) => `${baseUrl}/uploads/${file}`);
   }
 
@@ -19,5 +19,26 @@ export class FileUploadService {
     } catch {
       return 'fail to delete file';
     }
+  }
+
+  async uploadFile(file: Express.Multer.File) {
+    // Convert to WebP
+    const webpFilename = file.filename.replace(extname(file.filename), '.webp');
+
+    await sharp(file.path)
+      .webp({ quality: 80 })
+      .toFile(`./uploads/${webpFilename}`)
+
+    // Generate WebP thumbnail
+    const thumbnailWebp = `thumb-${webpFilename}`;
+    await sharp(file.path)
+      .resize(200, 200)
+      .webp({ quality: 70 })
+      .toFile(`./uploads/${thumbnailWebp}`)
+
+    return {
+      webp: `./uploads/${webpFilename}`,
+      thumbnail: `./uploads/${thumbnailWebp}`,
+    };
   }
 }

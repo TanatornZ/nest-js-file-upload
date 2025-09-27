@@ -29,8 +29,12 @@ export class FileUploadController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return { message: 'File uploaded successfully', filePath: file.path };
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    const { thumbnail, webp } = await this.fileUploadService.uploadFile(file);
+    return {
+      message: 'File uploaded successfully',
+      filePath: { original: `./uploads/${file.filename}`, thumbnail, webp },
+    };
   }
 
   @Delete(':fileName')
