@@ -1,5 +1,5 @@
-import { Injectable, UploadedFile } from '@nestjs/common';
-import { readdirSync, unlinkSync } from 'fs';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { existsSync, readdirSync, unlinkSync } from 'fs';
 import { extname, join } from 'path';
 import sharp from 'sharp';
 
@@ -12,9 +12,16 @@ export class FileUploadService {
     return files.map((file) => `${baseUrl}/uploads/${file}`);
   }
 
-  async deleteFileByName(fileName: string) {
+  deleteFileByName(fileName: string) {
+    const filePath = join(this.uploadDir, fileName);
+
+    // Check if file exists
+    if (!existsSync(filePath)) {
+      throw new NotFoundException(`File ${fileName} not found`);
+    }
+
     try {
-      unlinkSync(`${this.uploadDir}/${fileName}`)
+      unlinkSync(filePath);
       return 'file is deleted';
     } catch {
       return 'fail to delete file';
@@ -27,14 +34,14 @@ export class FileUploadService {
 
     await sharp(file.path)
       .webp({ quality: 80 })
-      .toFile(`./uploads/${webpFilename}`)
+      .toFile(`./uploads/${webpFilename}`);
 
     // Generate WebP thumbnail
     const thumbnailWebp = `thumb-${webpFilename}`;
     await sharp(file.path)
       .resize(200, 200)
       .webp({ quality: 70 })
-      .toFile(`./uploads/${thumbnailWebp}`)
+      .toFile(`./uploads/${thumbnailWebp}`);
 
     return {
       webp: `./uploads/${webpFilename}`,

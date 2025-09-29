@@ -4,9 +4,7 @@ import { AppService } from './app.service';
 import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
-  imports: [
-    FileUploadModule,
-  ],
+  imports: [FileUploadModule],
   controllers: [AppController],
   providers: [AppService],
 })
