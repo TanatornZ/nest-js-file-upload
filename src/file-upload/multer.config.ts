@@ -14,7 +14,24 @@ export const multerConfig = {
   }),
 };
 
-export const fileFilter = (req, file, callback) => {
+export const fileFilter = (
+  {
+    file,
+  }: {
+    file: {
+      fieldname: string;
+      originalname: string;
+      encoding: string;
+      mimetype: string;
+      size: number;
+      destination: string;
+      filename: string;
+      path: string;
+      buffer: Buffer<ArrayBufferLike>;
+    };
+  },
+  callback: (error: Error | null, acceptFile: boolean) => void,
+) => {
   // Allow only image files
   if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
     return callback(new Error('Only image files are allowed'), false);

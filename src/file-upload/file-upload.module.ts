@@ -8,7 +8,7 @@ import { fileFilter, multerConfig } from './multer.config';
   imports: [
     MulterModule.register({
       storage: multerConfig.storage,
-      fileFilter: fileFilter,
+      fileFilter: (_req, file, callback) => fileFilter({ file }, callback),
     }),
   ],
   controllers: [FileUploadController],
